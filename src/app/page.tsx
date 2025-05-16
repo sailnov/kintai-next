@@ -1,98 +1,90 @@
-import Image from "next/image";
+import Holidays from "date-holidays";
+import { useMemo } from "react";
 
 export default function Home() {
-    return (
-        <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-            <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-                <Image
-                    className="dark:invert"
-                    src="/next.svg"
-                    alt="Next.js logo"
-                    width={180}
-                    height={38}
-                    priority
-                />
-                <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-                    <li className="mb-2 tracking-[-.01em]">
-                        Get started by editing ああああ
-                        <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">src/app/page.tsx</code>.
-                    </li>
-                    <li className="tracking-[-.01em]">Save and see your changes instantly.</li>
-                </ol>
+    const month: number = new Date().getMonth() + 1;
+    const country: string = "JP";
+    const hoursPerDay: number = 8;
+    const salaryPerHour: number = 4400;
 
-                <div className="flex gap-4 items-center flex-col sm:flex-row">
-                    <a
-                        className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-                        href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                    >
-                        <Image
-                            className="dark:invert"
-                            src="/vercel.svg"
-                            alt="Vercel logomark"
-                            width={20}
-                            height={20}
-                        />
-                        Deploy now
-                    </a>
-                    <a
-                        className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-                        href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                    >
-                        Read our docs
-                    </a>
+    const hd = useMemo(() => new Holidays(country, "default", "ja"), [country]);
+    const totalBusinessDays = useMemo(() => {
+        const year = new Date().getFullYear();
+        const month = new Date().getMonth() + 1;
+        const holidays = hd.getHolidays(year);
+        const holidaysInMonth = holidays.filter((holiday) => new Date(holiday.date).getMonth() + 1 === month);
+        let totalBusinessDays = 0;
+        for (let i = 1; i <= 31; i++) {
+            const date = new Date(year, month - 1, i);
+            if (date.getMonth() + 1 !== month) {
+                break;
+            }
+            if (date.getDay() === 0 || date.getDay() === 6) {
+                continue;
+            }
+            if (holidaysInMonth.some((holiday) => holiday.date === date.toISOString().split("T")[0])) {
+                continue;
+            }
+            totalBusinessDays++;
+        }
+        return totalBusinessDays;
+    }, [hd]);
+    const totalCapacityHours = useMemo(() => {
+        return totalBusinessDays * hoursPerDay;
+    }, [totalBusinessDays, hoursPerDay]);
+    const capacityEstimateSalary = useMemo(() => {
+        return totalCapacityHours * salaryPerHour;
+    }, [totalCapacityHours, salaryPerHour]);
+
+    const totalActualHours = useMemo(() => {
+        // TODO: 実績時間を取得する
+        return 12;
+    }, []);
+    const actualEstimateSalary = useMemo(() => {
+        return totalActualHours * salaryPerHour;
+    }, [totalActualHours, salaryPerHour]);
+    return (
+        <main className="max-w-5xl mx-auto w-full p-4">
+            <h1 className="text-xl font-bold">時間情報</h1>
+            <div className="grid grid-cols-12 gap-4 mt-4 items-center justify-center">
+                <div className="rounded-xl p-4 border border-neutral-200 col-span-full md:col-span-6 lg:col-span-4">
+                    <h4 className="font-semibold mb-2">{month}月のキャパ</h4>
+                    <p className="text-3xl font-bold mb-1">
+                        {totalCapacityHours} <span className="text-lg">時間</span>
+                    </p>
+                    <p className="text-sm text-neutral-500">
+                        推定報酬:{" "}
+                        {capacityEstimateSalary.toLocaleString("ja-JP", {
+                            style: "currency",
+                            currency: "JPY",
+                            minimumFractionDigits: 0,
+                        })}
+                        円
+                    </p>
                 </div>
-            </main>
-            <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-                <a
-                    className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-                    href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    <Image
-                        aria-hidden
-                        src="/file.svg"
-                        alt="File icon"
-                        width={16}
-                        height={16}
-                    />
-                    Learn
-                </a>
-                <a
-                    className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-                    href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    <Image
-                        aria-hidden
-                        src="/window.svg"
-                        alt="Window icon"
-                        width={16}
-                        height={16}
-                    />
-                    Examples
-                </a>
-                <a
-                    className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-                    href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    <Image
-                        aria-hidden
-                        src="/globe.svg"
-                        alt="Globe icon"
-                        width={16}
-                        height={16}
-                    />
-                    Go to nextjs.org →
-                </a>
-            </footer>
-        </div>
+                <div className="rounded-xl p-4 border border-neutral-200 col-span-full md:col-span-6 lg:col-span-4">
+                    <h4 className="font-semibold mb-2">{month}月の実績</h4>
+                    <p className="text-3xl font-bold mb-1">
+                        {totalActualHours} <span className="text-lg">時間</span>
+                    </p>
+                    <p className="text-sm text-neutral-500">
+                        報酬目安:{" "}
+                        {actualEstimateSalary.toLocaleString("ja-JP", {
+                            style: "currency",
+                            currency: "JPY",
+                            minimumFractionDigits: 0,
+                        })}
+                        円
+                    </p>
+                </div>
+                <div className="rounded-xl p-4 border border-neutral-200 col-span-full md:col-span-6 lg:col-span-4">
+                    <h4 className="font-semibold mb-2">{month}月の平均実績</h4>
+                    <p className="text-3xl font-bold mb-1">
+                        8 <span className="text-lg">時間</span>
+                    </p>
+                    <p className="text-sm text-neutral-500">営業日における稼働時間の平均値</p>
+                </div>
+            </div>
+        </main>
     );
 }
