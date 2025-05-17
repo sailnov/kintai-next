@@ -44,9 +44,8 @@ export default function Home() {
         return totalActualHours * salaryPerHour;
     }, [totalActualHours, salaryPerHour]);
     return (
-        <main className="max-w-5xl mx-auto w-full p-4">
-            <h1 className="text-xl font-bold">時間情報</h1>
-            <div className="grid grid-cols-12 gap-4 mt-4 items-center justify-center">
+        <main className="max-w-5xl mx-auto w-full p-6">
+            <div className="grid grid-cols-12 gap-4 not-even:items-center justify-center">
                 <div className="rounded-xl p-4 border border-neutral-200 col-span-full md:col-span-6 lg:col-span-4">
                     <h4 className="font-semibold mb-2">{month}月のキャパ</h4>
                     <p className="text-3xl font-bold mb-1">
@@ -85,6 +84,8 @@ export default function Home() {
                     <p className="text-sm text-neutral-500">営業日における稼働時間の平均値</p>
                 </div>
             </div>
+            <hr className="mt-6 border-neutral-200" />
+            <h1 className="text-xl font-bold mt-4">稼働実績</h1>
         </main>
     );
 }
